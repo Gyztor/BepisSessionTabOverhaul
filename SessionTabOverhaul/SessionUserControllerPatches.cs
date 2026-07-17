@@ -108,21 +108,22 @@ namespace SessionTabOverhaul
 
             ui.Panel();
             ui.OverlappingLayout();
-            RectMesh<AudioSourceWaveformMesh> audioSourceWaveForm = ui.RectMesh<AudioSourceWaveformMesh>();
-            AudioSourceWaveformMesh wav = audioSourceWaveForm.Mesh;
-            wav.HistoryLength.Value = 0.5f;
-            wav.Points.Value = 1024;
-            wav.Width.Value = 1f;
-            try
-            {
-                wav.Source.Target = (user.Streams.FirstOrDefault(s => s is OpusStream<MonoSample>) as OpusStream<MonoSample>)!;
+            if (SessionTabOverhaul.ShowAudioWaveform.Value){
+                RectMesh<AudioSourceWaveformMesh> audioSourceWaveForm = ui.RectMesh<AudioSourceWaveformMesh>();
+                AudioSourceWaveformMesh wav = audioSourceWaveForm.Mesh;
+                wav.HistoryLength.Value = 0.5f;
+                wav.Points.Value = 1024;
+                wav.Width.Value = 1f;
+                try
+                {
+                    wav.Source.Target = (user.Streams.FirstOrDefault(s => s is OpusStream<MonoSample>) as OpusStream<MonoSample>)!;
+                }
+                catch
+                {
+                    wav.Source.Target = audioSourceWaveForm.Slot.GetComponentOrAttach<LocalAudioDeviceStream>();
+                }
+                wav.Color.DriveFrom(controller._name.Target.Color);
             }
-            catch
-            {
-                wav.Source.Target = audioSourceWaveForm.Slot.GetComponentOrAttach<LocalAudioDeviceStream>();
-            }
-            wav.Color.DriveFrom(controller._name.Target.Color);
-
             if (!SessionTabOverhaul.HideAllBadges.Value)
             {
                 extraData.BadgesLabel = ui.Text("", alignment: Alignment.MiddleLeft);

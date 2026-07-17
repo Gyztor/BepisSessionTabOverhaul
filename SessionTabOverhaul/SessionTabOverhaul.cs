@@ -75,6 +75,7 @@ namespace SessionTabOverhaul
         internal static ConfigEntry<bool> ShowFPSOrQueuedMessages;
         internal static ConfigEntry<bool> ShowSteamButton;
         internal static ConfigEntry<bool> ShowVoiceMode;
+        internal static ConfigEntry<bool> ShowAudioWaveform;
 
         internal static ConfigEntry<colorX> LocalUserColor;
         internal static ConfigEntry<colorX> FirstRowColor;
@@ -98,6 +99,7 @@ namespace SessionTabOverhaul
             ShowFPSOrQueuedMessages = Config.Bind("User Info", "Show FPS Or Queued", true, new ConfigDescription("Show the FPS / Queued messages in the Session Users list."));
             ShowSteamButton = Config.Bind("User Info", "Show Steam Button", false, new ConfigDescription("Show the Steam button in the Session Users list."));
             ShowVoiceMode = Config.Bind("User Info", "Show Voice Mode", true, new ConfigDescription("Colors the Local Users's username."));
+            ShowAudioWaveform = Config.Bind("User Info", "Show Audio Waveform", false, new ConfigDescription("Shows the Audio Output Waveform behind the user badges."));
 
             LocalUserColor = Config.Bind("Usernames", "Local User Color", RadiantUI_Constants.Hero.PURPLE, new ConfigDescription("The Color the Local Username should be set to."));
             FirstRowColor = Config.Bind("Row Colors", "First Row Color", new colorX(0, .85f), new ConfigDescription("Background color of the first row in the Session user lists."));
