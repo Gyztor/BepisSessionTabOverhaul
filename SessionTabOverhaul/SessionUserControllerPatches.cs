@@ -53,9 +53,9 @@ namespace SessionTabOverhaul
             FontCollection badgeFont = controller.GetBadgeFontCollection();
 
             extraData.RowBackgroundImage = horizontal.Slot.AttachComponent<Image>();
-            extraData.RowBackgroundImage.Tint.Value = (horizontal.Slot.ChildIndex & 1) == 0 ? SessionTabOverhaul.FirstRowColor : SessionTabOverhaul.SecondRowColor;
+            extraData.RowBackgroundImage.Tint.Value = (horizontal.Slot.ChildIndex & 1) == 0 ? SessionTabOverhaul.FirstRowColor.Value : SessionTabOverhaul.SecondRowColor.Value;
 
-            if (SessionTabOverhaul.ShowFPSOrQueuedMessages)
+            if (SessionTabOverhaul.ShowFPSOrQueuedMessages.Value)
             {
                 ui.Style.MinHeight = SessionUserController.HEIGHT;
                 ui.Style.MinWidth = 2.5f * SessionUserController.HEIGHT;
@@ -66,7 +66,7 @@ namespace SessionTabOverhaul
                 ui.NestOut();
             }
 
-            if (SessionTabOverhaul.ShowDeviceLabel)
+            if (SessionTabOverhaul.ShowDeviceLabel.Value)
             {
                 ui.Style.MinWidth = 1.5f * SessionUserController.HEIGHT;
                 ui.Style.MinHeight = 0.8f * SessionUserController.HEIGHT;
@@ -87,11 +87,11 @@ namespace SessionTabOverhaul
 
             _initialColor ??= controller._name.Target.Color.Value;
 
-            if (user.IsHost && SessionTabOverhaul.ColorHostName)
+            if (user.IsHost && SessionTabOverhaul.ColorHostName.Value)
                 controller._name.Target.Color.Value = HostColor;
 
-            if (user.IsLocalUser && SessionTabOverhaul.ColorLocalUserName)
-                controller._name.Target.Color.Value = SessionTabOverhaul.LocalUserColor;
+            if (user.IsLocalUser && SessionTabOverhaul.ColorLocalUserName.Value)
+                controller._name.Target.Color.Value = SessionTabOverhaul.LocalUserColor.Value;
 
             if (user.UserID != null)
             {
@@ -123,7 +123,7 @@ namespace SessionTabOverhaul
             }
             wav.Color.DriveFrom(controller._name.Target.Color);
 
-            if (!SessionTabOverhaul.HideAllBadges)
+            if (!SessionTabOverhaul.HideAllBadges.Value)
             {
                 extraData.BadgesLabel = ui.Text("", alignment: Alignment.MiddleLeft);
                 extraData.BadgesLabel.Font.Target = badgeFont;
@@ -143,7 +143,7 @@ namespace SessionTabOverhaul
             colorXDrive.PressColor.Value = colorX.Gray;
             colorXDrive.DisabledColor.Value = colorX.DarkGray;
 
-            if (SessionTabOverhaul.ShowVoiceMode)
+            if (SessionTabOverhaul.ShowVoiceMode.Value)
             {
                 ui.Style.MinWidth = SessionUserController.HEIGHT;
                 Button voiceModeButton = ui.Button(GetUserVoiceModeLabel(user));
@@ -185,7 +185,7 @@ namespace SessionTabOverhaul
                 });
             };
 
-            if (SessionTabOverhaul.ShowBringButton)
+            if (SessionTabOverhaul.ShowBringButton.Value)
             {
                 extraData.BringButton = ui.Button("Bring");
                 extraData.BringButton.LocalPressed += (_, _) =>
@@ -223,10 +223,10 @@ namespace SessionTabOverhaul
                 };
             }
             
-            if (SessionTabOverhaul.ShowParentUserCheckbox)
+            if (SessionTabOverhaul.ShowParentUserCheckbox.Value)
                 extraData.ParentUserCheckbox = ui.Checkbox();
 
-            if (SessionTabOverhaul.ShowSteamButton)
+            if (SessionTabOverhaul.ShowSteamButton.Value)
             {
                 ui.Style.MinWidth = 80;
                 Button steamButton = ui.Button("Steam");
@@ -285,7 +285,7 @@ namespace SessionTabOverhaul
             if (!controllerExtraData.TryGetValue(__instance, out SessionUserControllerExtraData? extraData) || extraData?.BadgesLabel == null)
                 return false;
 
-            if (SessionTabOverhaul.HidePatreonBadge && (spriteName == "patreon" || spriteName == "stripe" || spriteName == "supporter"))
+            if (SessionTabOverhaul.HidePatreonBadge.Value && (spriteName == "patreon" || spriteName == "stripe" || spriteName == "supporter"))
                 return false;
 
             Sync<string> text = extraData.BadgesLabel.Content;
@@ -307,7 +307,7 @@ namespace SessionTabOverhaul
             if (!spriteFont.HasSprite(key))
                 spriteFont.AddSprite(key, badge, 1.25f);
 
-            if (SessionTabOverhaul.HideCustomBadges)
+            if (SessionTabOverhaul.HideCustomBadges.Value)
                 return false;
 
             AddStandardBadgePrefix(__instance, key);
@@ -376,7 +376,7 @@ namespace SessionTabOverhaul
                 return;
 
             if (extraData.RowBackgroundImage != null)
-                extraData.RowBackgroundImage.Tint.Value = (__instance.Slot.ChildIndex & 1) == 0 ? SessionTabOverhaul.FirstRowColor : SessionTabOverhaul.SecondRowColor;
+                extraData.RowBackgroundImage.Tint.Value = (__instance.Slot.ChildIndex & 1) == 0 ? SessionTabOverhaul.FirstRowColor.Value : SessionTabOverhaul.SecondRowColor.Value;
 
             User user = __instance.TargetUser;
 
@@ -394,14 +394,14 @@ namespace SessionTabOverhaul
                 {
                     __instance._name.Target.Color.Value = _initialColor ?? colorX.White;
 
-                    if (user.IsHost && SessionTabOverhaul.ColorHostName)
+                    if (user.IsHost && SessionTabOverhaul.ColorHostName.Value)
                     {
                         __instance._name.Target.Color.Value = HostColor;
                     }
 
-                    if (user.IsLocalUser && SessionTabOverhaul.ColorLocalUserName)
+                    if (user.IsLocalUser && SessionTabOverhaul.ColorLocalUserName.Value)
                     {
-                        __instance._name.Target.Color.Value = SessionTabOverhaul.LocalUserColor;
+                        __instance._name.Target.Color.Value = SessionTabOverhaul.LocalUserColor.Value;
                     }
                 }
             }

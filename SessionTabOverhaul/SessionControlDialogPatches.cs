@@ -38,7 +38,7 @@ namespace SessionTabOverhaul
                 }
 
                 Image image = accessLevelRow.AttachComponent<Image>();
-                image.Tint.Value = (accessLevelRow.ChildIndex & 1) == 0 ? SessionTabOverhaul.FirstRowColor : SessionTabOverhaul.SecondRowColor;
+                image.Tint.Value = (accessLevelRow.ChildIndex & 1) == 0 ? SessionTabOverhaul.FirstRowColor.Value : SessionTabOverhaul.SecondRowColor.Value;
             }
         }
 

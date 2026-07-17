@@ -1,0 +1,40 @@
+[config]
+schemaVersion = "0.0.1"
+
+[package]
+namespace = "GyztorMizirath"
+name = "ArrayEditor"
+versionNumber = "2.2.1"
+description = "A Bepis Mod Loader mod that cleans up the Session Tab in the Resonite Dash to have extra features and be more readable."
+websiteUrl = "https://github.com/Gyztor/BepisSessionTabOverhaul"
+containsNsfwContent = false
+
+[package.dependencies]
+ResoniteModding-BepisLoader = "1.6.0"
+
+
+[build]
+icon = "./Icon.png"
+readme = "./README.md"
+outdir = "./bin/build"
+
+[[build.copy]]
+source = "./license.txt"
+target = "/"
+
+
+[[build.copy]]
+source = "./SessionTabOverhaul/bin/Release/SessionTabOverhaul.dll"
+target = "plugins/SessionTabOverhaul/"
+
+[[build.copy]]
+source = "./BepisArrayEditor/bin/Release/SessionTabOverhaul.pdb"
+target = "plugins/SessionTabOverhaul/"
+
+[publish]
+repository = "https://thunderstore.io"
+communities = ["resonite"]
+
+[publish.categories]
+resonite = []
+

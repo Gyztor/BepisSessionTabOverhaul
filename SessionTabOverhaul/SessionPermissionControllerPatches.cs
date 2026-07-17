@@ -17,7 +17,7 @@ namespace SessionTabOverhaul
         private static void CreatePostfix(SessionPermissionController __result)
         {
             Image bgImage = __result.Slot.AttachComponent<Image>();
-            bgImage.Tint.Value = (__result.Slot.ChildIndex & 1) == 0 ? SessionTabOverhaul.FirstRowColor : SessionTabOverhaul.SecondRowColor;
+            bgImage.Tint.Value = (__result.Slot.ChildIndex & 1) == 0 ? SessionTabOverhaul.FirstRowColor.Value : SessionTabOverhaul.SecondRowColor.Value;
 
             __result.Slot.GetComponent<LayoutElement>().MinHeight.Value += 8;
 
@@ -32,7 +32,7 @@ namespace SessionTabOverhaul
         [HarmonyPatch(nameof(SessionPermissionController.OnCommonUpdate))]
         private static void OnCommonUpdatePostfix(SessionPermissionController __instance)
         {
-            __instance.Slot.GetComponent<Image>().Tint.Value = (__instance.Slot.ChildIndex & 1) == 0 ? SessionTabOverhaul.FirstRowColor : SessionTabOverhaul.SecondRowColor;
+            __instance.Slot.GetComponent<Image>().Tint.Value = (__instance.Slot.ChildIndex & 1) == 0 ? SessionTabOverhaul.FirstRowColor.Value : SessionTabOverhaul.SecondRowColor.Value;
         }
     }
 }
