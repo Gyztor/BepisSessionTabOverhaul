@@ -28,7 +28,7 @@ source = "./SessionTabOverhaul/bin/Release/SessionTabOverhaul.dll"
 target = "plugins/SessionTabOverhaul/"
 
 [[build.copy]]
-source = "./BepisArrayEditor/bin/Release/SessionTabOverhaul.pdb"
+source = "./SessionTabOverhaul/bin/Release/SessionTabOverhaul.pdb"
 target = "plugins/SessionTabOverhaul/"
 
 [publish]

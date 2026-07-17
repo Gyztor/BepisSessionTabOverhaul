@@ -84,6 +84,8 @@ namespace SessionTabOverhaul
 
         public override void Load()
         {
+            Log = base.Log;
+
             //Harmony harmony = new Harmony("net.NepuShiro.SessionTabOverhaul");
             ColorHostName = Config.Bind("Usernames", "Color Host Name", true, new ConfigDescription("Color the Host's username like the host icon."));
             ColorLocalUserName = Config.Bind("Usernames", "Color Local Username", true, new ConfigDescription("Colors the Local Users's username."));
@@ -101,8 +103,13 @@ namespace SessionTabOverhaul
             FirstRowColor = Config.Bind("User Info", "Show Voice Mode", new colorX(0, .85f), new ConfigDescription("Colors the Local Users's username."));
             SecondRowColor = Config.Bind("User Info", "Show Voice Mode", new colorX(1, .15f), new ConfigDescription("Colors the Local Users's username."));
             
-
-            HarmonyInstance.PatchAll();
+            try {
+                HarmonyInstance.PatchAll();
+                Log.LogInfo("SessionTabOverhaul Loaded!");
+            } catch (System.Exception ex)
+            {
+                Log.LogError($"SessionTabOverhaul failed to patch: {ex}");
+            }
         }
     }
 }
