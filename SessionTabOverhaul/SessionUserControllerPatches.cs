@@ -209,29 +209,21 @@ namespace SessionTabOverhaul
 
                         UserRoot? root = user.Root;
                         CharacterController? charControl = (root?.GetRegisteredComponent<LocomotionController>()?.ActiveModule as IPhysicalLocomotion)?.CharacterController;
-                        if (charControl != null)
+                        if (charControl != null && charControl.LinearDamping.Value != float.MaxValue)
                         {
                             float oldval = charControl.LinearDamping.Value;
                             charControl.LinearDamping.Value = float.MaxValue;
-                            user.StartTask(async () =>
+                            root?.Slot?.RunInUpdates(15, () =>
                             {
-                                for (int i = 0; i < 5; i++)
-                                {
-                                    await default(NextUpdate);
-                                }
-
-                                charControl.RunSynchronously(() =>
-                                {
-                                    root?.JumpToPoint(user.World.LocalUser.Root.HeadPosition);
-                                    if (extraData.ParentUserCheckbox?.State.Value == true) root?.Slot.SetParent(user.World.LocalUser.Root.Slot.Parent);
-                                    charControl.LinearDamping.Value = oldval;
-                                });
+                                root?.JumpToPoint(user.World.LocalUser.Root.HeadPosition);
+                                if (extraData.ParentUserCheckbox?.State.Value == true) root?.Slot.SetParent(user.World.LocalUser.Root.Slot.Parent);
+                                charControl.LinearDamping.Value = oldval;
                             });
                         }
                     });
                 };
             }
-            
+
             if (SessionTabOverhaul.ShowParentUserCheckbox)
                 extraData.ParentUserCheckbox = ui.Checkbox();
 
@@ -243,7 +235,9 @@ namespace SessionTabOverhaul
                 if (user.Metadata.TryGetElement("SteamID", out SyncVar value) && value.TryGetValue(out ulong steamID))
                 {
                     steamButton.Enabled = true;
-                    steamButton.LocalPressed += (_, _) => Process.Start($"https://steamcommunity.com/profiles/{steamID}");
+                    Hyperlink link = steamButton.Slot.AttachComponent<Hyperlink>();
+                    link.URL.Value = new Uri($"https://steamcommunity.com/profiles/{steamID}");
+                    link.Reason.Value = "SessionTabOverhaul Steam Profile";
                 }
             }
 
@@ -365,12 +359,12 @@ namespace SessionTabOverhaul
 
         private static string GetUserVoiceModeLabel(User user) => GetUserVoiceMode(user) switch
         {
-            VoiceMode.Mute => muteSprite,
-            VoiceMode.Whisper => whisperSprite,
-            VoiceMode.Normal => normalSprite,
-            VoiceMode.Shout => shoutSprite,
+            VoiceMode.Mute      => muteSprite,
+            VoiceMode.Whisper   => whisperSprite,
+            VoiceMode.Normal    => normalSprite,
+            VoiceMode.Shout     => shoutSprite,
             VoiceMode.Broadcast => broadcastSprite,
-            _ => ""
+            _                   => ""
         };
 
         private static colorX GetUserVoiceModeColor(User user) => VoiceHelper.GetColor(GetUserVoiceMode(user)).SetSaturation(.5f);
@@ -379,10 +373,8 @@ namespace SessionTabOverhaul
 
         private static void AssignVoiceStream(User user, OpusStream<MonoSample>? voiceStream, SessionUserControllerExtraData extraData)
         {
-            if (voiceStream == null)
-            {
-                voiceStream = user.Streams.OfType<OpusStream<MonoSample>>().FirstOrDefault(s => s.Name == "Voice");
-            }
+            voiceStream ??= user.Streams.OfType<OpusStream<MonoSample>>().FirstOrDefault(s => s.Name == "Voice");
+
             if (voiceStream == null)
             {
                 return;
@@ -393,14 +385,10 @@ namespace SessionTabOverhaul
                 if (user.World.LocalUser.Root == null)
                     return;
 
-                UserRoot? root = user.Root;
-
+                Slot? root = user.Root?.Slot;
                 if (root == null) return;
 
-                Slot rootSlot = root.Slot;
-                string slotName = $"{user.UserName}'s Voice Stream VolumeMeter";
-
-                VolumeMeter volMeter = rootSlot.FindLocalChildOrAdd(slotName).GetComponentOrAttach<VolumeMeter>();
+                VolumeMeter volMeter = root.FindLocalChildOrAdd($"{user.UserName}'s Voice Stream VolumeMeter").GetComponentOrAttach<VolumeMeter>();
                 volMeter.Source.Target = voiceStream;
                 volMeter.Power.Value = .25f;
                 volMeter.Smoothing.Value = 0;
@@ -469,12 +457,12 @@ namespace SessionTabOverhaul
 
             if (extraData.WaveformGraphTag != null && extraData.WaveformLineGraphMesh != null && extraData.WaveformGraphOffset != null)
             {
-                if (extraData.WorldSpaceVolumeMeter != null && extraData.WorldSpaceVolumeMeter.TryGetTarget(out VolumeMeter worldSpaceVolumeMeter))
+                if (extraData.WorldSpaceVolumeMeter != null && extraData.WorldSpaceVolumeMeter.TryGetTarget(out VolumeMeter? worldSpaceVolumeMeter) && worldSpaceVolumeMeter != null)
                 {
                     // creating a faux-waveform...
                     // using the actual waveform mesh would've been nice, but
                     // getting that to work between worldspace and userspace is incredibly complicated :(
-                    extraData.WaveformGraphTag.Value.Value = .5f + ((worldSpaceVolumeMeter.Volume.Value / 2) * (__instance.World.Time.LocalUpdateIndex % 2 == 0 ? 1 : -1));
+                    extraData.WaveformGraphTag.Value.Value = .5f + worldSpaceVolumeMeter.Volume.Value / 2 * (__instance.World.Time.LocalUpdateIndex % 2 == 0 ? 1 : -1);
                 }
                 else
                 {
