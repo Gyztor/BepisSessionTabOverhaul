@@ -6,7 +6,7 @@
         <RootNamespace>SessionTabOverhaul</RootNamespace>
         <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
         <TargetFramework>net10.0</TargetFramework>
-        <Version>2.2.1</Version>
+        <Version>2.2.2</Version>
         <FileAlignment>512</FileAlignment>
         <LangVersion>10.0</LangVersion>
         <Nullable>enable</Nullable>

@@ -4,7 +4,7 @@ schemaVersion = "0.0.1"
 [package]
 namespace = "GyztorMizirath"
 name = "SessionTabOverhaul"
-versionNumber = "2.2.1"
+versionNumber = "2.2.2"
 description = "A Bepis Mod Loader mod that cleans up the Session Tab in the Resonite Dash to have extra features and be more readable."
 websiteUrl = "https://github.com/Gyztor/BepisSessionTabOverhaul"
 containsNsfwContent = false
