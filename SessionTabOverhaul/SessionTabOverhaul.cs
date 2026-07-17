@@ -100,8 +100,8 @@ namespace SessionTabOverhaul
             ShowVoiceMode = Config.Bind("User Info", "Show Voice Mode", true, new ConfigDescription("Colors the Local Users's username."));
 
             LocalUserColor = Config.Bind("Usernames", "Local User Color", RadiantUI_Constants.Hero.PURPLE, new ConfigDescription("The Color the Local Username should be set to."));
-            FirstRowColor = Config.Bind("User Info", "Show Voice Mode", new colorX(0, .85f), new ConfigDescription("Colors the Local Users's username."));
-            SecondRowColor = Config.Bind("User Info", "Show Voice Mode", new colorX(1, .15f), new ConfigDescription("Colors the Local Users's username."));
+            FirstRowColor = Config.Bind("Row Colors", "First Row Color", new colorX(0, .85f), new ConfigDescription("Background color of the first row in the Session user lists."));
+            SecondRowColor = Config.Bind("Row Colors", "Second Row Color", new colorX(1, .15f), new ConfigDescription("Background color of the second row in the Session user lists."));
             
             try {
                 HarmonyInstance.PatchAll();
