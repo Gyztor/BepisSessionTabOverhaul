@@ -28,9 +28,10 @@ Adds the following features to the Users list:
 
 ## Screenshots
 
-![Settings tab with alternating background for Access Levels.](https://github.com/NepuShiro/ResoniteSessionTabOverhaul/assets/2124570/f040fb21-4e37-44b1-ab60-7dda8069b748)
+![Settings tab with alternating background for Access Levels.](https://github.com/user-attachments/assets/1f80649f-dece-48d4-8e12-481caeedc807)
 
-![Users tab with added details and alternating background for the rows.](https://github.com/nepuShiro/ResoniteSessionTabOverhaul/assets/2124570/b36f00c6-2539-4d3b-b47c-e2bee748b831)
+![Users tab with added details and alternating background for the rows.](https://github.com/user-attachments/assets/725d8d20-114d-4043-8f6a-5fd89c689f6e)
+
 
 ## Credits
 [Gyztor Mizirath](https://github.com/Gyztor) - Bepis Port
