@@ -4,7 +4,7 @@
 
 A [Resonite](https://resonite.com/) mod that overhauls the Session Tab of the Dash, most notably the Users list, by adding more (toggleable) details and options. 
 
-## Original [Here](https://github.com/Banane9/NeosSessionTabOverhaul)
+### Original [Here](https://github.com/Banane9/NeosSessionTabOverhaul)
 
 Adds the following features to the Users list:
 * Alternating background colors for the rows
