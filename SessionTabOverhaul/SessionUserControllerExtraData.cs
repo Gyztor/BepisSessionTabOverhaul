@@ -1,6 +1,7 @@
 ﻿using FrooxEngine;
 using FrooxEngine.UIX;
 using System;
+using Elements.Core;
 
 namespace SessionTabOverhaul
 {
@@ -22,6 +23,7 @@ namespace SessionTabOverhaul
 
         public Text? VoiceModeLabel { get; set; }
 
+        public WeakReference<CloudValueVariable<colorX>>? CloudColor { get; set; }
 
 
         public ValueTag<float>? WaveformGraphTag { get; set; }

@@ -6,9 +6,9 @@ using HarmonyLib;
 using Renderite.Shared;
 using SkyFrost.Base;
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Image = FrooxEngine.UIX.Image;
 using User = FrooxEngine.User;
 
 namespace SessionTabOverhaul
@@ -17,13 +17,13 @@ namespace SessionTabOverhaul
     internal static class SessionUserControllerPatches
     {
         private const string headless = "headless";
-        private const string headlessSprite = $"<sprite name=\"{headless}\">";
+        private const string headlessSprite = $"<sprite name=\"{headless}\" tint=true>";
 
         private const string screen = "screen";
-        private const string screenSprite = $"<sprite name=\"{screen}\">";
+        private const string screenSprite = $"<sprite name=\"{screen}\" tint=true>";
 
         private const string vr = "vr";
-        private const string vrSprite = $"<sprite name=\"{vr}\">";
+        private const string vrSprite = $"<sprite name=\"{vr}\" tint=true>";
 
         private const string muteSprite = $"<sprite name=\"{nameof(VoiceMode.Mute)}\">";
         private const string whisperSprite = $"<sprite name=\"{nameof(VoiceMode.Whisper)}\">";
@@ -32,7 +32,6 @@ namespace SessionTabOverhaul
         private const string broadcastSprite = $"<sprite name=\"{nameof(VoiceMode.Broadcast)}\">";
 
         private static readonly colorX HostColor = new colorX(1, .678f, .169f);
-        private static colorX? _initialColor;
 
         private static readonly ConditionalWeakTable<SessionUserController, SessionUserControllerExtraData> controllerExtraData = new ConditionalWeakTable<SessionUserController, SessionUserControllerExtraData>();
 
@@ -85,8 +84,6 @@ namespace SessionTabOverhaul
             ui.Panel();
             controller._name.Target = ui.Text(controller._cachedUserName, alignment: Alignment.MiddleLeft);
 
-            _initialColor ??= controller._name.Target.Color.Value;
-
             if (user.IsHost && SessionTabOverhaul.ColorHostName.Value)
                 controller._name.Target.Color.Value = HostColor;
 
@@ -98,6 +95,11 @@ namespace SessionTabOverhaul
                 // In LocalHome or for anonymous users, there is no id
                 Button button = controller._name.Target.Slot.AttachComponent<Button>();
                 button.SetupAction(SessionUserController.OpenUserProfile, user.UserID);
+
+                CloudValueVariable<colorX> cloudVariable = controller._name.Target.Slot.AttachComponent<CloudValueVariable<colorX>>();
+                cloudVariable.VariableOwnerId.Value = user.UserID;
+                cloudVariable.Path.Value = SessionTabOverhaul.CloudColorPath.Value; //"G-Resonite.UserSettings.Color.Primary";
+                extraData.CloudColor = new WeakReference<CloudValueVariable<colorX>>(cloudVariable);
             }
 
             ui.NestOut();
@@ -108,9 +110,11 @@ namespace SessionTabOverhaul
 
             ui.Panel();
             ui.OverlappingLayout();
-            if (SessionTabOverhaul.ShowAudioWaveform.Value){
+            if (SessionTabOverhaul.ShowAudioWaveform.Value)
+            {
                 RectMesh<LineGraphMesh> audioSourceWaveForm = ui.RectMesh<LineGraphMesh>();
                 LineGraphMesh wav = audioSourceWaveForm.Mesh;
+                wav.Color.DriveFrom(controller._name.Target.Color);
                 wav.Width.Value = 1f;
                 ValueGraphRecorder valueGraphRecorder = audioSourceWaveForm.Slot.AttachComponent<ValueGraphRecorder>();
                 ValueTag<float> field = audioSourceWaveForm.Slot.AttachComponent<ValueTag<float>>();
@@ -206,22 +210,31 @@ namespace SessionTabOverhaul
                             return;
 
                         UserRoot? root = user.Root;
-                        CharacterController? charControl = (root?.GetRegisteredComponent<LocomotionController>()?.ActiveModule as IPhysicalLocomotion)?.CharacterController;
-                        if (charControl != null && charControl.LinearDamping.Value != float.MaxValue)
+                        LocomotionController? charControl = root?.GetRegisteredComponent<LocomotionController>();
+                        if (charControl != null)
                         {
-                            float oldval = charControl.LinearDamping.Value;
-                            charControl.LinearDamping.Value = float.MaxValue;
-                            root?.Slot?.RunInUpdates(15, () =>
+                            ILocomotionModule prevModule = charControl.ActiveModule;
+                            ILocomotionModule? noclip = charControl.LocomotionModules.FirstOrDefault(x => x.LocomotionDescription.ToString().Contains("noclip", StringComparison.InvariantCultureIgnoreCase));
+                            if (noclip != null)
+                            {
+                                charControl.ActiveModule = noclip;
+                                root?.Slot?.RunInUpdates(15, () =>
+                                {
+                                    root?.JumpToPoint(user.World.LocalUser.Root.HeadPosition);
+                                    if (extraData.ParentUserCheckbox?.State.Value == true) root?.Slot.SetParent(user.World.LocalUser.Root.Slot.Parent);
+                                    charControl.ActiveModule = prevModule;
+                                });
+                            }
+                            else
                             {
                                 root?.JumpToPoint(user.World.LocalUser.Root.HeadPosition);
                                 if (extraData.ParentUserCheckbox?.State.Value == true) root?.Slot.SetParent(user.World.LocalUser.Root.Slot.Parent);
-                                charControl.LinearDamping.Value = oldval;
-                            });
+                            }
                         }
                     });
                 };
             }
-            
+
             if (SessionTabOverhaul.ShowParentUserCheckbox.Value)
                 extraData.ParentUserCheckbox = ui.Checkbox();
 
@@ -406,30 +419,41 @@ namespace SessionTabOverhaul
                 extraData.RowBackgroundImage.Tint.Value = (__instance.Slot.ChildIndex & 1) == 0 ? SessionTabOverhaul.FirstRowColor.Value : SessionTabOverhaul.SecondRowColor.Value;
 
             User user = __instance.TargetUser;
+            
+            colorX? awayColor = null;
+            if (!user.IsPresentInWorld)
+            {
+                awayColor = colorX.Red;
+            }
+            else if (!user.IsPresentInHeadset)
+            {
+                awayColor = colorX.Red.SetSaturation(0.5f);
+            }
 
             if (__instance._name.Target != null && user.HeadDevice != HeadOutputDevice.Headless)
             {
-                if (!user.IsPresentInWorld)
-                {
-                    __instance._name.Target.Color.Value = colorX.Red;
-                }
-                else if (!user.IsPresentInHeadset)
-                {
-                    __instance._name.Target.Color.Value = colorX.Red.SetSaturation(0.5f);
-                }
-                else
-                {
-                    __instance._name.Target.Color.Value = _initialColor ?? colorX.White;
+                colorX color = RadiantUI_Constants.TEXT_COLOR;
 
-                    if (user.IsHost && SessionTabOverhaul.ColorHostName.Value)
-                    {
-                        __instance._name.Target.Color.Value = HostColor;
-                    }
+                if (SessionTabOverhaul.ColorCloudColor.Value && extraData.CloudColor != null && extraData.CloudColor.TryGetTarget(out var cloudColor) && cloudColor != null && cloudColor.IsLinkedToCloud.Value && cloudColor.Value.Value != new colorX(0, 0, 0, 0))
+                {
+                    ColorHSV cloud = new ColorHSV(cloudColor.Value.Value);
+                    color = MathX.Clamp01(new ColorHSV(cloud.h % 1f, cloud.s, MathX.Clamp(cloud.v, 0.88f, 1f)).ToRGB(cloudColor.Value.Value.Profile));
+                }
+                else if (awayColor.HasValue)
+                {
+                    color = awayColor.Value;
+                }
 
-                    if (user.IsLocalUser && SessionTabOverhaul.ColorLocalUserName.Value)
-                    {
-                        __instance._name.Target.Color.Value = SessionTabOverhaul.LocalUserColor.Value;
-                    }
+                __instance._name.Target.Color.Value = color;
+
+                if (user.IsHost && SessionTabOverhaul.ColorHostName.Value)
+                {
+                    __instance._name.Target.Color.Value = HostColor;
+                }
+
+                if (user.IsLocalUser && SessionTabOverhaul.ColorLocalUserName.Value)
+                {
+                    __instance._name.Target.Color.Value = SessionTabOverhaul.LocalUserColor.Value;
                 }
             }
 
@@ -437,7 +461,10 @@ namespace SessionTabOverhaul
                 extraData.FPSOrQueuedMessagesLabel.Content.Value = GetUserFPSOrQueuedMessages(user);
 
             if (extraData.DeviceLabel != null)
+            {
+                extraData.DeviceLabel.Color.Value = awayColor ?? RadiantUI_Constants.TEXT_COLOR;
                 extraData.DeviceLabel.Content.Value = GetUserDevice(user);
+            }
 
             __instance._slider.Target.BaseColor.Value = GetUserVoiceModeColor(user);
 
@@ -449,10 +476,11 @@ namespace SessionTabOverhaul
 
             if (extraData.BringButton != null)
                 extraData.BringButton.Enabled = !user.IsLocalUser;
-            
+
             if (extraData.ParentUserCheckbox != null)
                 extraData.ParentUserCheckbox.Enabled = !user.IsLocalUser;
-                        if (extraData.WaveformGraphTag != null && extraData.WaveformLineGraphMesh != null && extraData.WaveformGraphOffset != null)
+
+            if (extraData.WaveformGraphTag != null && extraData.WaveformLineGraphMesh != null && extraData.WaveformGraphOffset != null)
             {
                 if (extraData.WorldSpaceVolumeMeter != null && extraData.WorldSpaceVolumeMeter.TryGetTarget(out VolumeMeter? worldSpaceVolumeMeter) && worldSpaceVolumeMeter != null)
                 {

@@ -66,6 +66,8 @@ namespace SessionTabOverhaul
 
         internal static ConfigEntry<bool> ColorHostName;
         internal static ConfigEntry<bool> ColorLocalUserName;
+        internal static ConfigEntry<bool> ColorCloudColor;
+        internal static ConfigEntry<string> CloudColorPath;
         internal static ConfigEntry<bool> HideAllBadges;
         internal static ConfigEntry<bool> HideCustomBadges;
         internal static ConfigEntry<bool> HidePatreonBadge;
@@ -90,6 +92,8 @@ namespace SessionTabOverhaul
             //Harmony harmony = new Harmony("net.NepuShiro.SessionTabOverhaul");
             ColorHostName = Config.Bind("Usernames", "Color Host Name", true, new ConfigDescription("Color the Host's username like the host icon."));
             ColorLocalUserName = Config.Bind("Usernames", "Color Local Username", true, new ConfigDescription("Colors the Local Users's username."));
+            ColorCloudColor = Config.Bind("Usernames", "Color Names CloudColor", true, "Colors the names of users to their cloudcolors");
+            CloudColorPath = Config.Bind("Usernames", "Cloud Color Path", "G-Resonite.CustomUserColor", "The path of the cloudvariable to use");
             HideAllBadges = Config.Bind("Badges", "Hide All Badges", false, new ConfigDescription("Hide all Badges in the Session Users list."));
             HideCustomBadges = Config.Bind("Badges", "Hide Custom Badges", false, new ConfigDescription("Hide Custom Badges in the Session Users list."));
             HidePatreonBadge = Config.Bind("Badges", "Hide Patreon Badge", false, new ConfigDescription("Hides the Patreon badge in the Session Users list."));
@@ -112,6 +116,12 @@ namespace SessionTabOverhaul
             {
                 Log.LogError($"SessionTabOverhaul failed to patch: {ex}");
             }
+        }
+
+        public override bool Unload()
+        {
+            HarmonyInstance.UnpatchSelf();
+            return true;
         }
     }
 }
