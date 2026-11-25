@@ -5,8 +5,8 @@
         <Product>SessionTabOverhaul</Product>
         <RootNamespace>SessionTabOverhaul</RootNamespace>
         <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-        <TargetFramework>net10.0</TargetFramework>
-        <Version>2.2.4</Version>
+        <TargetFramework>net11.0</TargetFramework>
+        <Version>2.2.5</Version>
         <FileAlignment>512</FileAlignment>
         <LangVersion>14.0</LangVersion>
         <Nullable>enable</Nullable>
@@ -36,20 +36,13 @@
     <ItemGroup>
         <PackageReference Include="BepInEx.NET.CoreCLR" Version="6.0.0-be.*" IncludeAssets="compile" />
         <PackageReference Include="BepInEx.ResonitePluginInfoProps" Version="3.*" />
-        <PackageReference Include="ResoniteModding.BepInExResoniteShim" Version="0.9.*" />
+        <PackageReference Include="ResoniteModding.BepInExResoniteShim" Version="0.10.*" />
         <PackageReference Include="ResoniteModding.BepisLocaleLoader" Version="1.*" />
-        <PackageReference Include="HarmonyX" Version="2.*" />
+        <!--<PackageReference Include="HarmonyX" Version="2.*" />-->
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3" PrivateAssets="all"/>
-        <!--<Reference Include="HarmonyLib">
-            <HintPath>$(ResonitePath)rml_libs\0Harmony.dll</HintPath>
-            <HintPath Condition="Exists('$(ResonitePath)Libraries\0Harmony.dll')">$(ResonitePath)Libraries\0Harmony.dll</HintPath>
-            <HintPath Condition="Exists('$(ResonitePath)MonkeyLoader\0Harmony.dll')">$(ResonitePath)MonkeyLoader\0Harmony.dll</HintPath>
-            <HintPath Condition="Exists('$(ResonitePath)0Harmony.dll')">$(ResonitePath)0Harmony.dll</HintPath>
-            <Private>False</Private>
-        </Reference>-->
         <Reference Include="Elements.Core" Publicize="true">
             <HintPath>$(ResonitePath)Elements.Core.dll</HintPath>
             <Private>False</Private>
@@ -74,10 +67,6 @@
             <HintPath>$(ResonitePath)Renderite.Shared.dll</HintPath>
             <Private>False</Private>
         </Reference>
-        <!--<Reference Include="ResoniteModLoader">
-            <HintPath>$(ResonitePath)Libraries\ResoniteModLoader.dll</HintPath>
-            <Private>False</Private>
-        </Reference>-->
         <Reference Include="SkyFrost.Base.Models" Publicize="true">
             <HintPath>$(ResonitePath)SkyFrost.Base.Models.dll</HintPath>
             <Private>False</Private>
